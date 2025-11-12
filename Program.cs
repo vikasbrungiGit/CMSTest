@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using UhaulComIntegration.Logging;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 class Program
 {
@@ -46,8 +47,12 @@ class Program
         //                                        serviceMethod: nameof(_corporateManagementServiceClient.SaveAccountAsync),
         //                                        request: saveRequest,
         //                                        codeBlock: _corporateManagementServiceClient.SaveAccountAsync
-        //                                    );
+        //
+        //);
+        var sw = Stopwatch.StartNew();
         var response = await _corporateManagementServiceClient.SaveAccountAsync(saveRequest);
+        sw.Stop();
+        Console.WriteLine("SaveCorpAccount response time: "+sw.Elapsed.ToString());
         return response;
     }
 
@@ -79,15 +84,15 @@ class Program
 
     private static CorporateManagementServiceClient CreateCorporateManagementServiceClient()
     {
-        var endpoint = new EndpointAddress("https://uhiservicesd.amerco.org/CorporateManagementService/CorporateManagementService.svc");
+        var endpoint = new EndpointAddress("https://corpmanagementplatformd.amerco.org/corporatemanagementservice/CorporateManagementService.svc");
         var binding = new WSHttpBinding
         {
             Security = { Mode = SecurityMode.Transport },
             MaxReceivedMessageSize = int.MaxValue,
-            CloseTimeout = new TimeSpan(0, 2, 0),
+            CloseTimeout = new TimeSpan(0, 5, 0),
             OpenTimeout = new TimeSpan(0, 2, 0),
             // ReceiveTimeout = new TimeSpan(0, 2, 0), // The default is 10 minutes -- let's keep that.
-            SendTimeout = new TimeSpan(0, 2, 0)
+            SendTimeout = new TimeSpan(0, 5, 0)
         };
 
         return new CorporateManagementServiceClient(binding, endpoint);
